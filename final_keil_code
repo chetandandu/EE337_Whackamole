@@ -1,0 +1,444 @@
+; This subroutine writes characters on the LCD
+LCD_data equ P2    ;LCD Data port
+LCD_rs   equ P0.0  ;LCD Register Select
+LCD_rw   equ P0.1  ;LCD Read/Write
+LCD_en   equ P0.2  ;LCD Enable
+ch       equ 700h
+ORG 0000H
+ljmp start
+
+
+
+
+org 200h
+start:
+mov r4,#0
+mov r5,#0
+mov TMOD,#21h			//Configure Timer 1 in Mode 2 // intializing timer 0
+mov TH1, #243					//Load TH1 to obtain require Baudrate (Refer Serial.pdf for calculations)
+mov SCON, #50h			//Configure UART peripheral for 8-bit data transfer 
+setb TR1								//Start Timer 1
+setb ES									//Enable Serial Interrupt
+setb EA					//Enable Global Interrupt
+setb et0
+      mov P2,#00h
+      mov P1,#00h
+	  ;initial delay for lcd power up	;here1:setb p1.0
+      acall delay
+	  acall delay
+;Writing Get Ready in the first line.
+	  acall lcd_init      ;initialise LCD
+	  acall delay
+	  acall delay
+	  acall delay
+	  mov a,#83h		 ;Put cursor on first row,3 column
+	  acall lcd_command	 ;send command to LCD
+	  acall delay
+	  mov   dptr,#my_string1   ;Load DPTR with sring1 Addr
+	  acall lcd_sendstring	   ;call text strings sending routine
+	  acall delay1sec ;(need to be 2secs)
+	  acall delay1sec
+;writing stars in both lines	  
+	  
+	  mov a,#83h		 ;Put cursor on first row,3 column
+	  acall lcd_command	 ;send command to LCD
+	  acall delay
+	  mov   dptr,#my_string2   ;Load DPTR with sring1 Addr
+	  acall lcd_sendstring
+	  mov a,#0C3h		  ;Put cursor on second row,3 column
+	  acall lcd_command
+	  acall delay
+	  mov   dptr,#my_string2
+	  acall lcd_sendstring
+	  acall delay1sec;(need to be 3 secs)
+	  acall delay1sec
+	  acall delay1sec
+
+mov th0,#0F8H
+mov tl0,#030H
+setb tr0
+mov p1, #0FH
+mov r2, p1
+main:
+	cjne r2,#00H, not0
+	  mov a,#84h		 ;Put cursor on first row,4 column
+	  acall lcd_command	 ;send command to LCD
+	  acall delay
+	  mov   dptr,#my_string3   ;Load DPTR with sring1 Addr
+	  acall lcd_sendstring
+	  
+	  ljmp esc 
+not0:  cjne r2,#01H, not1
+	  mov a,#84h		 ;Put cursor on first row,3 column
+	  acall lcd_command	 ;send command to LCD
+	  acall delay
+	  mov   dptr,#my_string4   ;Load DPTR with sring1 Addr
+	  acall lcd_sendstring
+	  
+	  ljmp esc
+not1:  cjne r2,#02H, not2
+	  mov a,#84h		 ;Put cursor on first row,3 column
+	  acall lcd_command	 ;send command to LCD
+	  acall delay
+	  mov   dptr,#my_string5   ;Load DPTR with sring1 Addr
+	  acall lcd_sendstring
+	  
+	  ljmp esc
+not2:  cjne r2,#03H, not3
+	  mov a,#84h		 ;Put cursor on first row,3 column
+	  acall lcd_command	 ;send command to LCD
+	  acall delay
+	  mov   dptr,#my_string6   ;Load DPTR with sring1 Addr
+	  acall lcd_sendstring
+	  
+	  ljmp esc
+not3:  cjne r2,#04H, not4
+	  mov a,#84h		 ;Put cursor on first row,3 column
+	  acall lcd_command	 ;send command to LCD
+	  acall delay
+	  mov   dptr,#my_string7   ;Load DPTR with sring1 Addr
+	  acall lcd_sendstring
+	 
+	  ljmp esc
+not4:  cjne r2,#05H, not5
+	  mov a,#84h		 ;Put cursor on first row,3 column
+	  acall lcd_command	 ;send command to LCD
+	  acall delay
+	  mov   dptr,#my_string8   ;Load DPTR with sring1 Addr
+	  acall lcd_sendstring
+	  
+	  ljmp esc
+not5:  cjne r2,#06H, not6
+	  mov a,#84h		 ;Put cursor on first row,3 column
+	  acall lcd_command	 ;send command to LCD
+	  acall delay
+	  mov   dptr,#my_string9   ;Load DPTR with sring1 Addr
+	  acall lcd_sendstring
+	  
+	  ljmp esc
+not6:  cjne r2,#07H, not7
+	  mov a,#84h		 ;Put cursor on first row,3 column
+	  acall lcd_command	 ;send command to LCD
+	  acall delay
+	  mov   dptr,#my_string10   ;Load DPTR with sring1 Addr
+	  acall lcd_sendstring
+	  
+	  ljmp esc
+not7:  cjne r2,#08H, not8
+	  mov a,#0C4h		 ;Put cursor on first row,3 column
+	  acall lcd_command	 ;send command to LCD
+	  acall delay
+	  mov   dptr,#my_string3   ;Load DPTR with sring1 Addr
+	  acall lcd_sendstring
+	  
+	  ljmp esc
+not8:  cjne r2,#09H, not9
+	  mov a,#0C4h		 ;Put cursor on first row,3 column
+	  acall lcd_command	 ;send command to LCD
+	  acall delay
+	  mov   dptr,#my_string4   ;Load DPTR with sring1 Addr
+	  acall lcd_sendstring
+	  
+	  ljmp esc
+not9:  cjne r2,#0AH, not10
+	  mov a,#0C4h		 ;Put cursor on first row,3 column
+	  acall lcd_command	 ;send command to LCD
+	  acall delay
+	  mov   dptr,#my_string5   ;Load DPTR with sring1 Addr
+	  acall lcd_sendstring
+	  
+	  ljmp esc
+not10:  cjne r2,#0BH, not11
+	  mov a,#0C4h		 ;Put cursor on first row,3 column
+	  acall lcd_command	 ;send command to LCD
+	  acall delay
+	  mov   dptr,#my_string6   ;Load DPTR with sring1 Addr
+	  acall lcd_sendstring
+	  
+	  ljmp esc
+not11:  cjne r2,#0CH, not12
+	  mov a,#0C4h		 ;Put cursor on first row,3 column
+	  acall lcd_command	 ;send command to LCD
+	  acall delay
+	  mov   dptr,#my_string7   ;Load DPTR with sring1 Addr
+	  acall lcd_sendstring
+	  
+	  ljmp esc
+not12:  cjne r2,#0DH, not13
+	  mov a,#0C4h		 ;Put cursor on first row,3 column
+	  acall lcd_command	 ;send command to LCD
+	  acall delay
+	  mov   dptr,#my_string8   ;Load DPTR with sring1 Addr
+	  acall lcd_sendstring
+	  
+	  ljmp esc
+not13:  cjne r2,#0EH, not14
+	  mov a,#0C4h		 ;Put cursor on first row,3 column
+	  acall lcd_command	 ;send command to LCD
+	  acall delay
+	  mov   dptr,#my_string9   ;Load DPTR with sring1 Addr
+	  acall lcd_sendstring
+	  
+	  ljmp esc
+not14:  
+	  mov a,#0C4h		 ;Put cursor on first row,3 column
+	  acall lcd_command	 ;send command to LCD
+	  acall delay
+	  mov   dptr,#my_string10   ;Load DPTR with sring1 Addr
+	  acall lcd_sendstring
+	  
+esc:nop
+ljmp main
+
+loopout:
+;displaying on lcd the count
+	  acall lcd_init      ;initialise LCD
+	  acall delay
+	  acall delay
+	  acall delay
+	  mov a,#80h		 ;Put cursor on first row,3 column
+	  acall lcd_command	 ;send command to LCD
+	  acall delay
+	  mov   dptr,#my_string11   ;Load DPTR with sring1 Addr
+	  acall lcd_sendstring
+	  acall delay
+	  mov a, r6
+	  acall lcd_senddata
+acall delay1sec
+acall delay1sec
+acall delay1sec
+ljmp start				//jump to start
+
+;------------------------LCD Initialisation routine----------------------------------------------------
+lcd_init:
+         mov   LCD_data,#38H  ;Function set: 2 Line, 8-bit, 5x7 dots
+         clr   LCD_rs         ;Selected command register
+         clr   LCD_rw         ;We are writing in instruction register
+         setb  LCD_en         ;Enable H->L
+		 acall delay
+         clr   LCD_en
+	     acall delay
+
+         mov   LCD_data,#0CH  ;Display on, Curson off
+         clr   LCD_rs         ;Selected instruction register
+         clr   LCD_rw         ;We are writing in instruction register
+         setb  LCD_en         ;Enable H->L
+		 acall delay
+         clr   LCD_en
+         
+		 acall delay
+         mov   LCD_data,#01H  ;Clear LCD
+         clr   LCD_rs         ;Selected command register
+         clr   LCD_rw         ;We are writing in instruction register
+         setb  LCD_en         ;Enable H->L
+		 acall delay
+         clr   LCD_en
+         
+		 acall delay
+
+         mov   LCD_data,#06H  ;Entry mode, auto increment with no shift
+         clr   LCD_rs         ;Selected command register
+         clr   LCD_rw         ;We are writing in instruction register
+         setb  LCD_en         ;Enable H->L
+		 acall delay
+         clr   LCD_en
+
+		 acall delay
+         
+         ret                  ;Return from routine
+
+;-----------------------command sending routine-------------------------------------
+ lcd_command:
+         mov   LCD_data,A     ;Move the command to LCD port
+         clr   LCD_rs         ;Selected command register
+         clr   LCD_rw         ;We are writing in instruction register
+         setb  LCD_en         ;Enable H->L
+		 acall delay
+         clr   LCD_en
+		 acall delay
+    
+         ret  
+;-----------------------data sending routine-------------------------------------		     
+ lcd_senddata:
+         mov   LCD_data,A     ;Move the command to LCD port
+         setb  LCD_rs         ;Selected data register
+         clr   LCD_rw         ;We are writing
+         setb  LCD_en         ;Enable H->L
+		 acall delay
+         clr   LCD_en
+         acall delay
+		 acall delay
+         ret                  ;Return from busy routine
+
+;-----------------------text strings sending routine-------------------------------------
+lcd_sendstring:
+	push 0e0h
+	lcd_sendstring_loop:
+	 	 clr   a                 ;clear Accumulator for any previous data
+	         movc  a,@a+dptr         ;load the first character in accumulator
+	         jz    exit              ;go to exit if zero
+	         acall lcd_senddata      ;send first char
+	         inc   dptr              ;increment data pointer
+	         sjmp  LCD_sendstring_loop    ;jump back to send the next character
+exit:    pop 0e0h
+         ret                     ;End of routine
+;----------------------------------------------------------------------------------------------------
+//receiving a character 
+receive_char:
+receiveflag:jnb p3.0, receiveflag  ;check
+clr p3.0
+mov ch, sbuf
+ret
+//transmitting a character
+transmit_char:
+mov sbuf, ch ;doubt
+transmitflag:jnb p3.1, transmitflag 
+clr p3.1
+ret
+
+;----------------------delay routine-----------------------------------------------------
+delay:	 push 0
+	 push 1
+         mov r0,#1
+loop2:	 mov r1,#255
+	 loop1:	 djnz r1, loop1
+	 djnz r0, loop2
+	 pop 1
+	 pop 0 
+	 ret
+;here delay is 1 sec
+		delay1sec:
+		mov r3,#16
+		delay2:
+		mov R2,#245
+		delay1: 
+	    mov R1, #252
+		here1 : djnz R1, here1
+		djnz R2,delay1 
+		djnz r3,delay2
+		ret	
+;------------- ROM text strings---------------------------------------------------------------
+org 500h
+my_string1:
+         DB   "Get Ready", 00H
+my_string2:
+		 DB   " ********", 00H
+my_string3:
+		 DB   "m*******", 00H
+my_string4:
+		 DB   "*m******", 00H
+my_string5:
+		 DB   "**m*****", 00H
+my_string6:
+		 DB   "***m****", 00H
+my_string7:
+		 DB   "****m***", 00H
+my_string8:
+		 DB   "*****m**", 00H
+my_string9:
+		 DB   "******m*", 00H
+my_string10:
+		 DB   "*******m", 00H
+my_string11:
+			DB   "Score:", 00H
+			 
+;-------------- intrept------------------------------------------------------------------------			 
+org 0023H
+	ljmp main1
+	org 0600H
+	main1: nop 
+	acall receive_char
+	mov r1,ch	
+cjne r2,#00H, fxn0
+	cjne r1, #113, esca1
+	   inc r6	
+	  ljmp esca
+fxn0:  cjne r2,#01H, fxn1
+	  cjne r1, #119,esca1
+	  inc r6
+	  ljmp esca
+fxn1:  cjne r2,#02H, fxn2
+	  cjne r1, #101,esca1
+	  inc r6
+	  ljmp esca
+fxn2:  cjne r2,#03H, fxn3
+	  cjne r1, #114,esca
+	  inc r6
+esca1:  ljmp esca
+fxn3:  cjne r2,#04H, fxn4
+	  cjne r1, #116,esca
+	  inc r6
+	  ljmp esca
+fxn4:  cjne r2,#05H, fxn5
+	  cjne r1, #121, esca
+	  inc r6
+	  ljmp esca
+fxn5:  cjne r2,#06H, fxn6
+	  cjne r1, #117,esca
+	  inc r6
+	  ljmp esca
+fxn6:  cjne r2,#07H, fxn7
+	  cjne r1, #105,esca
+	  inc r6
+	  ljmp esca
+fxn7:  cjne r2,#08H, fxn8
+	  cjne r1, #97, esca
+	  inc r6
+	  ljmp esca
+fxn8:  cjne r2,#09H, fxn9
+	  cjne r1, #115, esca
+	  inc r6
+	  ljmp esca
+fxn9:  cjne r2,#0AH, fxn10
+	  cjne r1, #100, esca
+	  inc r6
+	  ljmp esca
+fxn10:  cjne r2,#0BH, fxn11
+	  cjne r1, #102, esca
+	  inc r6
+	  ljmp esca
+fxn11:  cjne r2,#0CH, fxn12
+	  cjne r1, #103, esca
+	  inc r6
+	  ljmp esca
+fxn12:  cjne r2,#0DH, fxn13
+	  cjne r1, #104,esca
+	  inc r6
+	  ljmp esca
+fxn13:  cjne r2,#0EH, fxn14
+	  cjne r1, #106, esca
+	  inc r6
+	  ljmp esca
+fxn14:cjne r1, #107,esca
+		inc r6
+esca:nop
+
+mov r1,A
+mov A,r2
+swap A
+add a,r2	
+jb acc.3,seta3
+xrl A,#00H
+seta3: xrl A,#0FFH
+rr a
+anl a,#0FH
+add a,r2
+mov b,#16
+mov r2,b
+mov a,r1
+	reti 
+	
+org 000BH
+	
+	inc r4
+cjne r4,#100,loopout1
+mov r4,#00H
+ inc r5
+cjne r5,#10,loopout1 
+ljmp loopout
+loopout1: nop
+mov th0,#0F8H
+mov tl0,#30H
+reti
+end
+
